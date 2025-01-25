@@ -83,12 +83,7 @@ class AppViewModel:
         settings_dialog.show()
 
     def get_setting(self, key: str, default=None):
-        """
-        获取系统配置项
-        :param key: 配置键
-        :param default: 默认值
-        :return: 配置值
-        """
+        """获取系统配置项"""
         config = self.system_config_viewmodel.get_config_by_key(key)
         return config.get("value") if config else default
 
@@ -108,8 +103,11 @@ class AppViewModel:
         """切换明暗主题"""
         current_theme = self.get_setting("theme", "light")
         new_theme = "dark" if current_theme == "light" else "light"
-        if self.update_setting("theme", new_theme):
+        success = self.system_config_viewmodel.update_config("theme", {"config_value": new_theme})
+        if success:
             self.notify("theme_changed", new_theme)
+            return True
+        return False
 
     def update_detail(self, field: str, value: str):
         """更新详情数据"""

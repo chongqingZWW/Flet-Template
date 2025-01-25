@@ -22,6 +22,13 @@ class AppView:
         self.viewmodel.subscribe("theme_changed", self._on_theme_changed)
         self.viewmodel.subscribe("nav_changed", self._on_nav_changed)
 
+        # 设置初始主题
+        initial_theme = self.viewmodel.get_setting("theme", "light")
+        self.page.theme_mode = (
+            ft.ThemeMode.DARK if initial_theme == "dark" else ft.ThemeMode.LIGHT
+        )
+        self.page.update()
+
         # 当前选中的导航项
         self.current_nav_index = 0
 
@@ -91,6 +98,7 @@ class AppView:
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=100,
             min_extended_width=200,
+            group_alignment=-0.9,  # 将导航项向上对齐
             destinations=[
                 ft.NavigationRailDestination(
                     icon=ft.icons.HOME_OUTLINED,
@@ -128,12 +136,23 @@ class AppView:
                     label="设置"
                 ),
             ],
-            on_change=lambda e: self.viewmodel.select_nav_item(e.control.selected_index)
+            on_change=lambda e: self.viewmodel.select_nav_item(e.control.selected_index),
+            # 主题切换按钮
+            trailing=ft.Container(
+                content=ft.IconButton(
+                    icon=ft.icons.DARK_MODE if self.page.theme_mode == ft.ThemeMode.LIGHT else ft.icons.LIGHT_MODE,
+                    on_click=lambda _: self.viewmodel.toggle_theme(),
+                    tooltip="切换主题",
+                ),
+                margin=ft.margin.only(bottom=20),
+            ),
         )
 
     def _on_theme_changed(self, theme):
         """主题变化回调"""
-        print(f"主题已切换为: {theme}")
+        # 更新页面主题
+        self.page.theme_mode = ft.ThemeMode.DARK if theme == "dark" else ft.ThemeMode.LIGHT
+        # 只更新页面，不单独更新控件
         self.page.update()
 
     def _on_nav_changed(self, index):
