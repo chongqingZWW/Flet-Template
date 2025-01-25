@@ -3,9 +3,9 @@ name = "flet-template"
 version = "1.0.0"
 description = "A template project for Flet applications"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
-    "flet>=0.25.0",
+    "flet>=0.21.1",
     "dynaconf>=3.2.0",
     "SQLAlchemy>=2.0.0",
     "pystray>=0.19.0",
@@ -29,3 +29,7 @@ exclude = [
 
 [tool.flet.app]
 path = "."
+
+[tool.poetry.dependencies]
+python = "^3.9"
+flet = "^0.21.1"

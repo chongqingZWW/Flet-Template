@@ -4,7 +4,6 @@ from app.component.ThemeManager import ThemeManager
 from app.config.database import DatabaseManager
 from app.config.global_config import GlobalConfig
 from app.repository.system_config_repository import SystemConfigRepository
-from app.repository.example_repository import ExampleRepository
 from app.view.app_view import AppView
 from app.viewmodel.app_viewmodel import AppViewModel
 
@@ -57,7 +56,6 @@ def main(page: ft.Page):
     try:
         # 初始化 Repository
         system_config_repo = SystemConfigRepository(session)
-        example_repo = ExampleRepository(session)  # 示例仓储
 
         # 加载全局配置
         global_settings_list = system_config_repo.get_all_configs()

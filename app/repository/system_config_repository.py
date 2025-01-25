@@ -20,7 +20,7 @@ class SystemConfigRepository:
             configs = self.session.query(SystemConfig).all()
             return [self._to_dict(config) for config in configs]
         except Exception as e:
-            logger.error(f"获取系统配置失败: {e}")
+            print(f"获取系统配置失败: {e}")
             return []
 
     def get_configs_by_category(self, category: str):
@@ -33,7 +33,7 @@ class SystemConfigRepository:
             configs = self.session.query(SystemConfig).filter_by(category=category).all()
             return [self._to_dict(config) for config in configs]
         except Exception as e:
-            logger.error(f"获取分类配置失败: {category}, 错误: {e}")
+            print(f"获取分类配置失败: {category}, 错误: {e}")
             return []
 
     def get_config_by_key(self, config_key: str):
@@ -46,7 +46,7 @@ class SystemConfigRepository:
             config = self.session.query(SystemConfig).filter_by(config_key=config_key).first()
             return self._to_dict(config) if config else None
         except Exception as e:
-            logger.error(f"获取配置失败: {config_key}, 错误: {e}")
+            print(f"获取配置失败: {config_key}, 错误: {e}")
             return None
 
     def add_config(self, config_data: dict):
@@ -62,7 +62,7 @@ class SystemConfigRepository:
             return self._to_dict(new_config)
         except Exception as e:
             self.session.rollback()
-            logger.error(f"新增配置失败: {e}")
+            print(f"新增配置失败: {e}")
             return None
 
     def update_config(self, config_key: str, updates: dict):
@@ -79,13 +79,13 @@ class SystemConfigRepository:
                     if hasattr(config, key):
                         setattr(config, key, value)
                 self.session.commit()
-                logger.info(f"配置已更新: {config_key}")
+                print(f"配置已更新: {config_key}")
                 return self._to_dict(config)
-            logger.warning(f"配置不存在: {config_key}")
+            print(f"配置不存在: {config_key}")
             return None
         except Exception as e:
             self.session.rollback()
-            logger.error(f"更新配置失败: {config_key}, 错误: {e}")
+            print(f"更新配置失败: {config_key}, 错误: {e}")
             return None
 
     def delete_config(self, config_key: str):
@@ -99,13 +99,13 @@ class SystemConfigRepository:
             if config:
                 self.session.delete(config)
                 self.session.commit()
-                logger.info(f"配置已删除: {config_key}")
+                print(f"配置已删除: {config_key}")
                 return True
-            logger.warning(f"配置不存在: {config_key}")
+            print(f"配置不存在: {config_key}")
             return False
         except Exception as e:
             self.session.rollback()
-            logger.error(f"删除配置失败: {config_key}, 错误: {e}")
+            print(f"删除配置失败: {config_key}, 错误: {e}")
             return False
 
     def init_default_configs(self):
@@ -119,10 +119,10 @@ class SystemConfigRepository:
                 existing = self.get_config_by_key(config["config_key"])
                 if not existing:
                     self.add_config(config)
-            logger.info("默认配置已初始化")
+            print("默认配置已初始化")
             return True
         except Exception as e:
-            logger.error(f"初始化默认配置失败: {e}")
+            print(f"初始化默认配置失败: {e}")
             return False
 
     @staticmethod

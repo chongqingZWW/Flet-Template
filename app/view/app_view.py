@@ -1,6 +1,13 @@
 import flet as ft
 
 from app.component.TrayIconManager import TrayIconManager
+from app.view.home_view import HomeView
+from app.view.settings_view import SettingsView
+from app.view.basic_components_view import BasicComponentsView
+from app.view.layout_components_view import LayoutComponentsView
+from app.view.form_components_view import FormComponentsView
+from app.view.data_components_view import DataComponentsView
+from app.view.feedback_components_view import FeedbackComponentsView
 
 
 class AppView:
@@ -11,21 +18,52 @@ class AppView:
         self.viewmodel = viewmodel
         self.tray_manager = TrayIconManager(page)
 
-        # 订阅主题变化
+        # 订阅事件
         self.viewmodel.subscribe("theme_changed", self._on_theme_changed)
         self.viewmodel.subscribe("nav_changed", self._on_nav_changed)
 
         # 当前选中的导航项
         self.current_nav_index = 0
 
+        # 初始化所有视图
+        self.views = {
+            "home": HomeView(page, viewmodel),
+            "basic": BasicComponentsView(page, viewmodel),
+            "layout": LayoutComponentsView(page, viewmodel),
+            "form": FormComponentsView(page, viewmodel),
+            "data": DataComponentsView(page, viewmodel),
+            "feedback": FeedbackComponentsView(page, viewmodel),
+            "settings": SettingsView(page, viewmodel),
+        }
+        
+        # 当前视图
+        self.current_view = "home"
+        self.content_area = None
+        
     def build(self):
         """构建并显示主界面"""
-        self.page.add(self.build_main_layout())
+        # 创建主布局
+        main_layout = self.build_main_layout()
+        
+        # 清空页面并添加主布局
+        self.page.clean()
+        self.page.add(main_layout)
         self.page.update()
+        
+        # 启动托盘图标
         self.tray_manager.start()
 
     def build_main_layout(self):
         """构建主界面布局"""
+        # 创建内容区域容器
+        self.content_area = ft.Container(
+            content=self.views[self.current_view].view,
+            bgcolor=ft.colors.SURFACE,
+            expand=3,
+            padding=ft.padding.all(20),
+            animate_opacity=300,
+        )
+
         return ft.Container(
             content=ft.Row(
                 controls=[
@@ -37,19 +75,8 @@ class AppView:
                         padding=ft.padding.all(0),
                     ),
                     # 中间内容区
-                    ft.Container(
-                        content=self._build_content_area(),
-                        bgcolor=ft.colors.SURFACE,
-                        expand=3,
-                        padding=ft.padding.all(20),
-                    ),
+                    self.content_area,
                     # 右侧详情区
-                    ft.Container(
-                        content=self._build_detail_area(),
-                        bgcolor=ft.colors.SURFACE_VARIANT,
-                        expand=2,
-                        padding=ft.padding.all(10),
-                    ),
                 ],
                 alignment=ft.MainAxisAlignment.START,
                 spacing=0,
@@ -64,21 +91,36 @@ class AppView:
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=100,
             min_extended_width=200,
-            leading=ft.FloatingActionButton(
-                icon=ft.icons.CREATE,
-                text="新建",
-                on_click=lambda e: print("新建按钮被点击")
-            ),
             destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.icons.BOOKMARK_BORDER,
-                    selected_icon=ft.icons.BOOKMARK,
-                    label="收藏夹"
-                ),
                 ft.NavigationRailDestination(
                     icon=ft.icons.HOME_OUTLINED,
                     selected_icon=ft.icons.HOME,
                     label="首页"
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.icons.WIDGETS_OUTLINED,
+                    selected_icon=ft.icons.WIDGETS,
+                    label="基础组件"
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.icons.DASHBOARD_OUTLINED,
+                    selected_icon=ft.icons.DASHBOARD,
+                    label="布局组件"
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.icons.INPUT_OUTLINED,
+                    selected_icon=ft.icons.INPUT,
+                    label="表单组件"
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.icons.DATA_USAGE,
+                    selected_icon=ft.icons.DATA_USAGE,
+                    label="数据展示"
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.icons.NOTIFICATIONS_OUTLINED,
+                    selected_icon=ft.icons.NOTIFICATIONS,
+                    label="反馈组件"
                 ),
                 ft.NavigationRailDestination(
                     icon=ft.icons.SETTINGS_OUTLINED,
@@ -89,63 +131,6 @@ class AppView:
             on_change=lambda e: self.viewmodel.select_nav_item(e.control.selected_index)
         )
 
-    def _build_content_area(self):
-        """构建中间内容区"""
-        return ft.Column(
-            controls=[
-                ft.Container(
-                    content=ft.Text("内容区域", size=20, weight=ft.FontWeight.BOLD),
-                    margin=ft.margin.only(bottom=20)
-                ),
-                ft.ListView(
-                    controls=[
-                        ft.ListTile(
-                            leading=ft.Icon(ft.icons.ARTICLE),
-                            title=ft.Text(f"项目 {i}"),
-                            subtitle=ft.Text(f"这是项目 {i} 的描述"),
-                        ) for i in range(1, 6)
-                    ],
-                    spacing=10,
-                    padding=10,
-                    expand=True,
-                )
-            ],
-            expand=True,
-        )
-
-    def _build_detail_area(self):
-        """构建右侧详情区"""
-        return ft.Column(
-            controls=[
-                ft.Text("详情区域", size=20, weight=ft.FontWeight.BOLD),
-                ft.Divider(),
-                ft.TextField(label="名称", value="示例项目"),
-                ft.TextField(
-                    label="描述",
-                    value="这是一个示例项目的详细描述...",
-                    multiline=True,
-                    min_lines=3,
-                ),
-                ft.Row(
-                    controls=[
-                        ft.ElevatedButton(
-                            text="保存",
-                            icon=ft.icons.SAVE,
-                            on_click=lambda e: print("保存按钮被点击")
-                        ),
-                        ft.OutlinedButton(
-                            text="取消",
-                            on_click=lambda e: print("取消按钮被点击")
-                        ),
-                    ],
-                    alignment=ft.MainAxisAlignment.END,
-                )
-            ],
-            spacing=20,
-            scroll=ft.ScrollMode.AUTO,
-            expand=True,
-        )
-
     def _on_theme_changed(self, theme):
         """主题变化回调"""
         print(f"主题已切换为: {theme}")
@@ -154,5 +139,28 @@ class AppView:
     def _on_nav_changed(self, index):
         """导航选择变化回调"""
         self.current_nav_index = index
-        print(f"导航已切换到: {index}")
-        self.page.update()
+        
+        # 根据索引获取新的视图名称
+        new_view = {
+            0: "home",
+            1: "basic",
+            2: "layout",
+            3: "form",
+            4: "data",
+            5: "feedback",
+            6: "settings"
+        }.get(index, "home")
+        
+        # 如果视图确实发生了变化
+        if new_view != self.current_view:
+            # 更新当前视图
+            self.current_view = new_view
+            
+            # 使用动画切换内容
+            self.content_area.opacity = 0
+            self.content_area.content = self.views[self.current_view].view
+            self.page.update()
+            
+            # 设置淡入效果
+            self.content_area.opacity = 1
+            self.content_area.update()

@@ -2,6 +2,7 @@ import flet as ft
 from app.component.SystemSettingsDialog import SystemSettingsDialog
 from app.repository.system_config_repository import SystemConfigRepository
 from app.viewmodel.system_config_viewmodel import SystemConfigViewModel
+from collections import defaultdict
 
 
 class AppViewModel:
@@ -22,7 +23,15 @@ class AppViewModel:
             "route_changed": [],      # 路由变化
             "nav_changed": [],        # 导航选择变化
             "theme_changed": [],      # 主题变化
-            "settings_updated": []    # 设置更新
+            "settings_updated": [],   # 设置更新
+            "detail_changed": []      # 详情变化
+        }
+
+        self.system_config_repo = system_config_repo
+        self._subscribers = defaultdict(list)
+        self._detail_data = {
+            "name": "示例项目",
+            "description": "这是一个示例项目的详细描述..."
         }
 
     # ---- 观察者模式实现 ----
@@ -101,3 +110,12 @@ class AppViewModel:
         new_theme = "dark" if current_theme == "light" else "light"
         if self.update_setting("theme", new_theme):
             self.notify("theme_changed", new_theme)
+
+    def update_detail(self, field: str, value: str):
+        """更新详情数据"""
+        self._detail_data[field] = value
+        self.notify("detail_changed", self._detail_data)
+
+    def get_detail(self, field: str) -> str:
+        """获取详情数据"""
+        return self._detail_data.get(field, "")
