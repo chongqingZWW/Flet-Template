@@ -1,0 +1,27 @@
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 0, 0, 0),
+    prodvers=(1, 0, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo([
+      StringTable(
+        '080404B0',
+        [StringStruct('CompanyName', '重庆智雾网科技有限公司'),
+         StringStruct('FileDescription', '扣排期'),
+         StringStruct('FileVersion', '1.0.0.0'),
+         StringStruct('ProductVersion', '1.0.0.0'),
+         StringStruct('InternalName', 'qa-gui'),
+         StringStruct('LegalCopyright', '©2024 重庆智雾网科技有限公司. All rights reserved.'),
+         StringStruct('OriginalFilename', 'qa-gui.exe'),
+         StringStruct('ProductName', '扣排期')])
+    ]),
+    VarFileInfo([VarStruct('Translation', [2052, 1200])])
+  ]
+)

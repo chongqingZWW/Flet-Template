@@ -1,0 +1,69 @@
+[default]
+PROJECT_NAME = "Flet Template"
+DEBUG = false
+RESOLUTION = "1200x800"
+
+[database]
+DB_PATH = "app.db"
+ECHO = false  # 是否打印 SQL 语句
+
+[development]
+DEBUG = true
+
+[production]
+DEBUG = false
+
+[colors]
+PRIMARY = "#2196F3"      # 主色
+SECONDARY = "#FF4081"    # 次要色
+BACKGROUND = "#F5F5F5"   # 背景色
+SURFACE = "#FFFFFF"      # 表面色
+TEXT_PRIMARY = "#212121" # 主要文字色
+TEXT_SECONDARY = "#757575" # 次要文字色
+DIVIDER = "#BDBDBD"     # 分割线色
+
+[theme.light]
+primary = "#2196F3"
+on_primary = "#FFFFFF"
+primary_container = "#E3F2FD"
+surface = "#FFFFFF"
+on_surface = "#212121"
+background = "#F5F5F5"
+
+[theme.dark]
+primary = "#90CAF9"
+on_primary = "#212121"
+primary_container = "#1976D2"
+surface = "#121212"
+on_surface = "#FFFFFF"
+background = "#000000"
+
+[layout]
+# 布局配置
+WINDOW_MIN_WIDTH = 800
+WINDOW_MIN_HEIGHT = 600
+WINDOW_DEFAULT_WIDTH = 1200
+WINDOW_DEFAULT_HEIGHT = 800
+LEFT_PANEL_WIDTH = 250
+RIGHT_PANEL_WIDTH = 300
+CONTENT_PADDING = 20
+
+[panels]
+# 面板背景色
+LEFT_PANEL_BG = "#FAFAFA"    # 左侧面板背景
+CONTENT_PANEL_BG = "#FFFFFF" # 内容区背景
+RIGHT_PANEL_BG = "#FAFAFA"   # 右侧面板背景
+
+[cache]
+# 缓存配置
+ENABLE = true
+MAX_ITEMS = 100
+EXPIRE_MINUTES = 30
+
+[logging]
+# 日志配置
+LEVEL = "INFO"
+FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+FILE_PATH = "logs/app.log"
+MAX_BYTES = 10485760  # 10MB
+BACKUP_COUNT = 5

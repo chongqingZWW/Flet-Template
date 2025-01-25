@@ -1,0 +1,31 @@
+[project]
+name = "flet-template"
+version = "1.0.0"
+description = "A template project for Flet applications"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "flet>=0.25.0",
+    "dynaconf>=3.2.0",
+    "SQLAlchemy>=2.0.0",
+    "pystray>=0.19.0",
+    "Pillow>=10.0.0"
+]
+
+[tool.flet]
+org = "com.example"
+product = "Flet Template"
+company = "Example Company"
+copyright = "©2024 Example Company. All rights reserved."
+exclude = [
+    ".idea",
+    ".pytest_cache", 
+    "docs",
+    "tests",
+    "__pycache__",
+    ".gitignore",
+    "README.md"
+]
+
+[tool.flet.app]
+path = "."
