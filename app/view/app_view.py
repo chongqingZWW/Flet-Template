@@ -8,6 +8,7 @@ from app.view.layout_components_view import LayoutComponentsView
 from app.view.form_components_view import FormComponentsView
 from app.view.data_components_view import DataComponentsView
 from app.view.feedback_components_view import FeedbackComponentsView
+from app.view.task_view import TaskView
 
 
 class AppView:
@@ -41,12 +42,15 @@ class AppView:
             "data": DataComponentsView(page, viewmodel),
             "feedback": FeedbackComponentsView(page, viewmodel),
             "settings": SettingsView(page, viewmodel),
+            "task": TaskView(page, viewmodel),
         }
         
         # 当前视图
         self.current_view = "home"
         self.content_area = None
         
+        self.view = self._build_view()
+
     def build(self):
         """构建并显示主界面"""
         # 创建主布局
@@ -60,36 +64,31 @@ class AppView:
         # 启动托盘图标
         self.tray_manager.start()
 
-    def build_main_layout(self):
-        """构建主界面布局"""
-        # 创建内容区域容器
+    def _build_view(self):
+        """构建主视图"""
+        # 创建内容区域
         self.content_area = ft.Container(
             content=self.views[self.current_view].view,
-            bgcolor=ft.colors.SURFACE,
-            expand=3,
-            padding=ft.padding.all(20),
+            expand=True,
             animate_opacity=300,
         )
 
-        return ft.Container(
-            content=ft.Row(
-                controls=[
-                    # 左侧导航栏
-                    ft.Container(
-                        content=self._build_nav_rail(),
-                        bgcolor=ft.colors.SURFACE_VARIANT,
-                        expand=0.5,
-                        padding=ft.padding.all(0),
-                    ),
-                    # 中间内容区
-                    self.content_area,
-                    # 右侧详情区
-                ],
-                alignment=ft.MainAxisAlignment.START,
-                spacing=0,
-            ),
+        # 构建主布局
+        return ft.Row(
+            [
+                # 左侧导航栏
+                self._build_nav_rail(),
+                # 分隔线
+                ft.VerticalDivider(width=1),
+                # 内容区域
+                self.content_area,
+            ],
             expand=True,
         )
+
+    def build_main_layout(self):
+        """构建主布局"""
+        return self.view
 
     def _build_nav_rail(self):
         """构建左侧导航栏"""
@@ -135,6 +134,11 @@ class AppView:
                     selected_icon=ft.icons.SETTINGS,
                     label="设置"
                 ),
+                ft.NavigationRailDestination(
+                    icon=ft.icons.SCHEDULE,
+                    selected_icon=ft.icons.SCHEDULE,
+                    label="任务管理",
+                ),
             ],
             on_change=lambda e: self.viewmodel.select_nav_item(e.control.selected_index),
             # 主题切换按钮
@@ -167,7 +171,8 @@ class AppView:
             3: "form",
             4: "data",
             5: "feedback",
-            6: "settings"
+            6: "settings",
+            7: "task"
         }.get(index, "home")
         
         # 如果视图确实发生了变化

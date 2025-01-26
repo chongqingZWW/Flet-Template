@@ -142,6 +142,33 @@ class SchedulerManager:
             self.scheduler.resume()
             logger.info("调度器已恢复")
 
+    def pause_job(self, job_id):
+        """暂停任务"""
+        try:
+            self.scheduler.pause_job(job_id)
+            logger.info(f"任务已暂停: {job_id}")
+        except Exception as e:
+            logger.error(f"暂停任务失败: {job_id}, 错误: {e}")
+            raise
+
+    def resume_job(self, job_id):
+        """恢复任务"""
+        try:
+            self.scheduler.resume_job(job_id)
+            logger.info(f"任务已恢复: {job_id}")
+        except Exception as e:
+            logger.error(f"恢复任务失败: {job_id}, 错误: {e}")
+            raise
+
+    def modify_job(self, job_id, **changes):
+        """修改任务"""
+        try:
+            self.scheduler.modify_job(job_id, **changes)
+            logger.info(f"任务已修改: {job_id}")
+        except Exception as e:
+            logger.error(f"修改任务失败: {job_id}, 错误: {e}")
+            raise
+
     @staticmethod
     def execute_task(task_id, task_name):
         """

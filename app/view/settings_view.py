@@ -14,7 +14,10 @@ class SettingsView(BaseView):
             content=ft.Column([
                 # 标题
                 ft.Container(
-                    content=ft.Text("设置", size=30, weight=ft.FontWeight.BOLD),
+                    content=ft.Column([
+                        ft.Text("设置", size=30, weight=ft.FontWeight.BOLD),
+                        ft.Text("自定义应用程序设置", size=16, color=ft.colors.GREY_700),
+                    ]),
                     margin=ft.margin.only(bottom=20)
                 ),
 
@@ -47,52 +50,102 @@ class SettingsView(BaseView):
 
     def _build_general_settings(self):
         """构建常规设置"""
+        def on_window_size_changed(e):
+            try:
+                width = int(window_width.value)
+                height = int(window_height.value)
+                if width >= 800 and height >= 600:
+                    self.page.window_width = width
+                    self.page.window_height = height
+                    self.viewmodel.save_setting("window_width", width)
+                    self.viewmodel.save_setting("window_height", height)
+                    self.page.show_snack_bar(
+                        ft.SnackBar(content=ft.Text("窗口大小已保存"))
+                    )
+            except ValueError:
+                self.page.show_snack_bar(
+                    ft.SnackBar(content=ft.Text("请输入有效的数值"))
+                )
+
+        def on_opacity_changed(e):
+            try:
+                opacity = float(e.control.value)
+                if 0.1 <= opacity <= 1.0:
+                    self.page.window_opacity = opacity
+                    self.viewmodel.save_setting("opacity", opacity)
+            except ValueError:
+                pass
+
+        window_width = ft.TextField(
+            label="窗口宽度",
+            value=str(self.page.window_width),
+            on_change=on_window_size_changed,
+            suffix_text="px",
+            width=200,
+        )
+
+        window_height = ft.TextField(
+            label="窗口高度",
+            value=str(self.page.window_height),
+            on_change=on_window_size_changed,
+            suffix_text="px",
+            width=200,
+        )
+
         return ft.Container(
             content=ft.Column([
-                ft.TextField(
-                    label="应用名称",
-                    value=self.viewmodel.get_setting("app_title", "Flet Application"),
-                    on_change=lambda e: self.viewmodel.update_setting("app_title", e.control.value)
-                ),
+                ft.Text("窗口设置", size=20, weight=ft.FontWeight.BOLD),
+                ft.Row([
+                    window_width,
+                    window_height,
+                ], alignment=ft.MainAxisAlignment.START, spacing=20),
+                ft.Text("窗口透明度", size=16),
                 ft.Slider(
-                    label="窗口透明度",
                     min=0.1,
                     max=1.0,
-                    value=float(self.viewmodel.get_setting("opacity", "1.0")),
+                    value=self.page.window_opacity,
                     divisions=9,
-                    on_change=lambda e: self.viewmodel.update_setting("opacity", str(e.control.value))
+                    label="{value}",
+                    on_change=on_opacity_changed,
                 ),
-                ft.Switch(
-                    label="开机自启",
-                    value=self.viewmodel.get_setting("auto_start", "false") == "true",
-                    on_change=lambda e: self.viewmodel.update_setting("auto_start", str(e.control.value).lower())
-                )
             ], spacing=20),
             padding=20
         )
 
     def _build_theme_settings(self):
         """构建主题设置"""
+        def on_theme_changed(e):
+            self.viewmodel.save_setting("theme", e.control.value)
+            self.viewmodel.toggle_theme()
+            self.page.show_snack_bar(
+                ft.SnackBar(content=ft.Text("主题已更改"))
+            )
+
+        def on_color_changed(color):
+            # 实现主题色切换
+            pass
+
         return ft.Container(
             content=ft.Column([
+                ft.Text("主题模式", size=20, weight=ft.FontWeight.BOLD),
                 ft.RadioGroup(
                     content=ft.Column([
                         ft.Radio(value="light", label="浅色主题"),
                         ft.Radio(value="dark", label="深色主题"),
                         ft.Radio(value="system", label="跟随系统"),
                     ]),
-                    value=self.viewmodel.get_setting("theme", "light"),
-                    on_change=lambda e: self.viewmodel.update_setting("theme", e.control.value)
+                    value="light" if self.page.theme_mode == ft.ThemeMode.LIGHT else "dark",
+                    on_change=lambda e: on_theme_changed(e),
                 ),
                 ft.Divider(),
-                ft.Text("主题色", size=16, weight=ft.FontWeight.BOLD),
+                ft.Text("主题颜色", size=20, weight=ft.FontWeight.BOLD),
                 ft.Row([
                     ft.Container(
                         bgcolor=color,
                         width=40,
                         height=40,
                         border_radius=ft.border_radius.all(5),
-                        on_click=lambda e, c=color: self.viewmodel.update_setting("primary_color", c)
+                        on_click=lambda e, c=color: on_color_changed(c)
                     ) for color in [
                         ft.colors.BLUE,
                         ft.colors.RED,
@@ -100,41 +153,51 @@ class SettingsView(BaseView):
                         ft.colors.PURPLE,
                         ft.colors.ORANGE
                     ]
-                ], spacing=10)
+                ], spacing=10),
             ], spacing=20),
             padding=20
         )
 
     def _build_system_settings(self):
         """构建系统设置"""
+        def on_auto_start_changed(e):
+            try:
+                self.viewmodel.save_setting("auto_start", e.control.value)
+                self.page.show_snack_bar(
+                    ft.SnackBar(content=ft.Text(
+                        "已启用开机自启" if e.control.value else "已禁用开机自启"
+                    ))
+                )
+            except Exception as e:
+                self.page.show_snack_bar(
+                    ft.SnackBar(content=ft.Text(f"设置失败: {str(e)}"))
+                )
+
+        def on_minimize_to_tray_changed(e):
+            self.viewmodel.save_setting("minimize_to_tray", e.control.value)
+
         return ft.Container(
             content=ft.Column([
-                ft.TextField(
-                    label="缓存目录",
-                    value=self.viewmodel.get_setting("cache_dir", "./cache"),
-                    read_only=True,
-                    suffix=ft.IconButton(
-                        icon=ft.icons.FOLDER_OPEN,
-                        on_click=lambda _: print("选择目录")
-                    )
-                ),
+                ft.Text("系统设置", size=20, weight=ft.FontWeight.BOLD),
                 ft.Row([
-                    ft.TextField(
-                        label="日志级别",
-                        value=self.viewmodel.get_setting("log_level", "INFO"),
-                        width=200
+                    ft.Text("开机自启", size=16),
+                    ft.Switch(
+                        value=self.viewmodel.get_setting("auto_start", False),
+                        on_change=on_auto_start_changed,
                     ),
-                    ft.TextField(
-                        label="最大日志文件大小(MB)",
-                        value=self.viewmodel.get_setting("max_log_size", "10"),
-                        width=200
-                    )
-                ]),
-                ft.ElevatedButton(
-                    "清除缓存",
-                    icon=ft.icons.CLEANING_SERVICES,
-                    on_click=lambda _: print("清除缓存")
-                )
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                ft.Row([
+                    ft.Text("最小化到托盘", size=16),
+                    ft.Switch(
+                        value=self.viewmodel.get_setting("minimize_to_tray", True),
+                        on_change=on_minimize_to_tray_changed,
+                    ),
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                ft.Divider(),
+                ft.Row([
+                    ft.Text("版本信息", size=16),
+                    ft.Text("v1.0.0", size=16, color=ft.colors.GREY),
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
             ], spacing=20),
             padding=20
         ) 

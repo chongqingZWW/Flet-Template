@@ -1,7 +1,7 @@
 import flet as ft
 
 from app.component.ThemeManager import ThemeManager
-from app.utils.notifications import NotificationManager
+from app.component.notifications import NotificationManager
 
 
 class SystemSettingsDialog:
