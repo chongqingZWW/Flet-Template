@@ -45,7 +45,7 @@ Flet Template 是一个基于 [Flet](https://flet.dev/) 框架开发的桌面应
 
 1. 克隆仓库
 ```bash
-git clone https://github.com/yourusername/flet-template.git
+git clone https://github.com/chongqingZWW/Flet-Template
 cd flet-template
 ```
 
@@ -129,6 +129,22 @@ flet-template/
 
 ## 📮 联系方式
 
-- 作者：[Your Name](https://github.com/yourusername)
+- 作者：[chongqingZWW](https://github.com/chongqingZWW)
 - 邮箱：986247535@qq.com 
-- 问题反馈：[Issues](https://github.com/yourusername/flet-template/issues)
+- 问题反馈：[Issues](https://github.com/chongqingZWW/flet-template/issues)
+
+## 💬 加入交流
+
+<div align="center">
+    <img src="assets/qq.jpg" alt="QQ频道" width="300"/>
+    <p>扫码加入QQ频道交流</p>
+</div>
+
+## ☕ 请我喝杯咖啡
+
+如果这个项目对你有帮助，可以请作者喝杯咖啡 ❤️
+
+<div align="center">
+    <img src="assets/ailipay.jpg" alt="支付宝" width="300"/>
+    <img src="assets/wechatpay.jpg" alt="微信" width="300"/>
+</div>
